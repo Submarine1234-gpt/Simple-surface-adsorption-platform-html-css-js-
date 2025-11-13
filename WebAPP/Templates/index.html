@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>表面吸附计算平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='echarts.min.js') }}"></script>
+    <!-- 使用Plotly.js实现3D可视化 -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>表面吸附计算平台</h1>
+        <p>上传结构文件，配置参数，实时查看计算日志并获取可视化结果。</p>
+
+        <form id="calculation-form" method="POST" action="/run-calculation" enctype="multipart/form-data">
+            <fieldset>
+                <legend>文件上传</legend>
+                <div class="form-group">
+                    <label for="substrate_file">上传基底文件 (.cif):</label>
+                    <input type="file" id="substrate_file" name="substrate_file" required>
+                </div>
+                <div class="form-group">
+                    <label for="adsorbate_file">上传吸附质文件 (.cif):</label>
+                    <input type="file" id="adsorbate_file" name="adsorbate_file" required>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>主要计算参数</legend>
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="surface_axis">表面法向轴:</label>
+                        <select id="surface_axis" name="surface_axis">
+                            <option value="0">x 轴 (0)</option>
+                            <option value="1">y 轴 (1)</option>
+                            <option value="2" selected>z 轴 (2)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adsorption_height">吸附高度 (Å):</label>
+                        <input type="number" id="adsorption_height" name="adsorption_height" value="2.0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vacuum_thickness">真空层厚度 (Å):</label>
+                        <input type="number" id="vacuum_thickness" name="vacuum_thickness" value="20.0" step="0.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="surface_search_depth">表面搜索深度 (Å):</label>
+                        <input type="number" id="surface_search_depth" name="surface_search_depth" value="3.5" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="collision_threshold">碰撞检测阈值 (Å):</label>
+                        <input type="number" id="collision_threshold" name="collision_threshold" value="1.2" step="0.1">
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <label for="hollow_sites_enabled">启用空位(Hollow)吸附</label>
+                        <input type="checkbox" id="hollow_sites_enabled" name="hollow_sites_enabled" checked>
+                        
+                    </div>
+                    <div class="form-group composite-group">
+                        <div class="checkbox-group">
+                            <label for="on_top_sites_enabled">启用顶位(On-Top)吸附</label>
+                            <input type="checkbox" id="on_top_sites_enabled" name="on_top_sites_enabled" checked>
+                            
+                        </div>
+                        <div id="on-top-options-container">
+                            <label for="on_top_target_atom">目标原子:</label>
+                            <input type="text" id="on_top_target_atom" name="on_top_target_atom" value="O">
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label for="place_on_bottom">吸附在表面底部</label>
+                        <input type="checkbox" id="place_on_bottom" name="place_on_bottom">
+                        
+                    </div>
+                    
+                </div>
+            </fieldset>
+            <fieldset>
+    <legend>高级算法参数</legend>
+    <div class="form-grid">
+
+        <!-- 旋转相关参数组 -->
+        <div class="form-group composite-group" id="rotation-method-options">
+            <label for="rotation_method">启用球面旋转旋转方法</label>
+            <input type="checkbox" id="rotation_method" name="rotation_method" on>
+
+            <label for="rotation_count">旋转轴数量（建议10~100）:</label>
+            <input type="number" id="rotation_count" name="rotation_count" value="30" min="1" max="200">
+
+            <div class="form-group">
+                <label for="rotation_step">旋转步长 (°):</label>
+                <input type="number" id="rotation_step" name="rotation_step" value="30" min="1" max="180">
+            </div>
+        </div>
+
+        <!-- Hollow相关参数组 -->
+        <div class="form-group" id="hollow-options">
+            <label for="knn_neighbors">Hollow点近邻数(k):</label>
+            <input type="number" id="knn_neighbors" name="knn_neighbors" value="2" step="1" min="2">
+
+            <label for="hollow_site_deduplication_distance">Hollow点去重距离 (Å):</label>
+            <input type="number" id="hollow_site_deduplication_distance" name="hollow_site_deduplication_distance" value="1.5" step="0.1">
+        </div>
+
+    </div>
+</fieldset>
+            <button type="submit" id="submit-button">开始计算</button>
+        </form>
+
+        <div id="dashboard" class="hidden">
+            <h2>计算状态</h2>
+            <div id="log-container"><pre id="log-output"></pre></div>
+            
+            <div id="chart-controls" class="hidden">
+                <button id="scatter-btn" class="chart-toggle-btn active">点位图 (Scatter Plot)</button>
+                <button id="heatmap-btn" class="chart-toggle-btn">热力图 (Heatmap)</button>
+                <button id="surface3d-btn" class="chart-toggle-btn">3D表面图 (3D Surface)</button>
+            </div>
+
+            <div id="heatmap-container" class="hidden" style="width: 100%; height:500px; margin-top:10px;"></div>
+            <div id="surface3d-container" class="hidden" style="width: 100%; height:500px; margin-top:10px;"></div>
+            
+            <div id="result-download-link" class="hidden">
+                <p>计算完成！</p>
+                <a href="#" id="download-button" class="button-download" download>下载结果 (.zip)</a>
+            </div>
+        </div>
+        
+        <div id="history-section">
+            <h2>我的暂存列表 (最多10条)</h2>
+            <table id="results-table">
+                <thead><tr><th>计算时间</th><th>文件名</th><th>下载</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <p id="no-history" class="hidden">暂无历史记录。</p>
+        </div>
+    </div>
+
+    <fieldset >
+        <div class="form-grid">
+            <div class="form-group">
+             <legend>使用说明</legend>
+              <label>注意事项:</label>
+              <p>1. 请确保上传的文件格式正确 (.cif)。</p>
+              <p>2. 暂存列表最多保留10条记录，超过后将自动删除最旧的记录。</p>
+              <p>3. 本程序无需用户自行为基底增加真空层，程序默认使用最小晶胞</p>
+              <p>4. 真空层添加规则为，在选定坐标轴方向上，为基底添加上下双面同等厚度真空层</p>
+              <p>5. 请根据实际情况调整计算参数，以获得更准确的结果。高级算法参数极度影响性能，请慎重选择。</p>
+             </div>
+        </div>
+    </fieldset>
+    <div align= "center" id="copyright"> 
+        <p>© 2025 表面吸附计算平台. 版权所有.</p>
+        <p>Powered by Python</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

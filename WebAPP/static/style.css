@@ -1,0 +1,361 @@
+/* 基本页面样式 */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+}
+
+/* 主容器样式 */
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+.container > p {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #7f8c8d;
+}
+
+/* 表单整体样式 */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* 增大区域间隔 */
+}
+
+fieldset {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 0;
+}
+
+legend {
+    padding: 0 10px;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* 标签和输入框的距离 */
+}
+
+label {
+    font-weight: 500;
+    color: #555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; 
+}
+
+input[type="file"] {
+    padding: 5px;
+}
+
+/* 参数配置区的网格布局 */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* ================================================= */
+/* === 这是实现您需求的核心CSS代码 === */
+/* ================================================= */
+.checkbox-group {
+    /* 使用Flexbox布局 */
+    display: flex;
+    /* 关键！将主轴方向设为垂直，实现上下排列 */
+    flex-direction: column; 
+    /* 在交叉轴上居中（水平居中） */
+    align-items: center;     
+    /* 在主轴上居中（垂直居中，可选）*/
+    justify-content: center;
+    gap: 8px; /* 勾选框和文字之间的距离 */
+    padding-top: 15px; /* 增加一点顶部空间，使其对齐 */
+}
+
+.checkbox-group input[type="checkbox"] {
+    /* 放大勾选框，使其更容易点击 */
+    width: 20px;  
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    font-weight: normal; /* 标签文字使用正常字重 */
+    font-size: 0.9em;
+}
+/* ================================================= */
+
+/* 提交按钮样式 */
+button[type="submit"] {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+button[type="submit"]:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* 状态信息区域样式 */
+#status-area {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#status-message {
+    padding: 15px;
+    border-radius: 5px;
+    display: none; /* 默认不显示 */
+    font-weight: bold;
+}
+
+#status-message.status-info,
+#status-message.status-success,
+#status-message.status-error {
+    display: inline-block; /* 当有状态时再显示 */
+}
+
+.status-info { background-color: #eaf5ff; color: #3498db; }
+.status-success { background-color: #e9f7ef; color: #2ecc71; }
+.status-error { background-color: #fbeae5; color: #e74c3c; }
+.composite-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 开关和选项之间的距离 */
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+/* 顶位吸附选项容器的样式 */
+#on-top-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: opacity 0.3s ease; /* 添加平滑的过渡效果 */
+}
+
+/* 当选项容器被禁用时的样式 */
+#on-top-options-container.disabled {
+    opacity: 0.5; /* 变半透明 */
+    pointer-events: none; /* 禁用所有鼠标事件 */
+}
+.hidden {
+    display: none !important;
+}
+
+#dashboard {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#log-container {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    border-radius: 4px;
+    padding: 15px;
+    height: 300px;
+    overflow-y: scroll;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+}
+
+#log-output {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#result-download-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-download {
+    display: inline-block;
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.button-download:hover {
+    background-color: #27ae60;
+}
+
+#history-section {
+    margin-top: 40px;
+}
+
+#results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#results-table th, #results-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+#results-table th {
+    background-color: #f2f2f2;
+}
+.composite-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 开关和选项之间的距离 */
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+/* 顶位吸附选项容器的样式 */
+#on-top-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: opacity 0.3s ease; /* 添加平滑的过渡效果 */
+}
+
+/* 当选项容器被禁用时的样式 */
+#on-top-options-container.disabled {
+    opacity: 0.5; /* 变半透明 */
+    pointer-events: none; /* 禁用所有鼠标事件 */
+}
+/* 在 style.css 中添加 */
+.hidden {
+    display: none !important;
+}
+#chart-controls {
+    text-align: center;
+    margin: 20px 0 10px 0;
+}
+
+.chart-toggle-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #555;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.chart-toggle-btn:first-of-type {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-right: none;
+}
+
+.chart-toggle-btn:nth-of-type(2) {
+    border-right: none;
+}
+
+.chart-toggle-btn:last-of-type {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.chart-toggle-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+/* === END OF NEW === */
+
+#heatmap-container, #surface3d-container {
+    width: 100%;
+    height: 500px;
+    margin-top: 10px;
+}
+
+#result-download-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-download {
+    display: inline-block;
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.button-download:hover {
+    background-color: #27ae60;
+}
+
+#history-section {
+    margin-top: 40px;
+}
+
+#results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#results-table th, #results-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+#results-table th {
+    background-color: #f2f2f2;
+}
+.button-small {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+}
